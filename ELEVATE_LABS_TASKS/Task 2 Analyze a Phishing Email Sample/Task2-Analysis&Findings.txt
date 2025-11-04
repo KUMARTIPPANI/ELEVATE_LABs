@@ -1,0 +1,54 @@
+
+---
+
+## Header analysis (key points observed)
+- Message passed through multiple Microsoft/Outlook transport hops.  
+- **SPF: softfail** for sender IP `80.96.157.90` (domain `winner-win.art` discouraged that sender) → suspicious.  
+- **DKIM: none** (message not signed).  
+- **DMARC: fail** for `header.from=newsletter.otto.de` → the visible From domain does not align with sending origin.  
+- `From` shows: `otto-newsletter@newsletter.otto.de` but `Reply-To`, `Return-Path`, and actual sending host point to `winner-win.art` and `whstr8` host — **domain mismatch**.  
+- X-Sender-IP: `80.96.157.90` — useful for further lookup/abuse reports.
+
+---
+
+## HTML/content analysis (key red flags)
+- Visible branding claims to be a newsletter / product promo (KetoXplode / weight loss) but **links point to shorteners or unrelated domains**: `https://t.co/eYVtqVunRC` and `http://bsq2.firiri.shop/...` — likely malicious redirect chain.  
+- Images loaded from `naintl.s3.eu-west-1.amazonaws.com` and tracking pixel from `bsq2.firiri.shop` — evidence of external content/tracking.  
+- Urgent CTA text and big button “ERHALTEN SIE IHRE BESTELLUNG!” trying to force clicks.  
+- Hidden 1x1 image (tracking pixel) indicates user opens are tracked.  
+- HTML contains German text but sender routing and domains are inconsistent — more signs of spoofing.
+
+---
+
+## Findings (concise)
+- Sender domain and mail-from do not match; SPF softfail and DMARC fail.  
+- No DKIM signature.  
+- Reply-To and Return-Path point to `winner-win.art` — likely malicious.  
+- Links in email lead to shorteners or unrelated domains which can redirect to phishing/malware sites.  
+- Tracking pixel present — campaign tracks opens.  
+- Social engineering: urgency, enticing offer (weight loss), and clear CTA.
+
+---
+
+## Risk assessment & recommendations
+- **Risk:** High — clicking links may lead to credential theft, malware, or scam pages.  
+- **Do not click** any links or download attachments.  
+- Mark the email as **spam/phishing** in your email client and report to the provider.  
+- Block the sender IP (80.96.157.90) and domains `winner-win.art` / `bsq2.firiri.shop` at your firewall or local hosts file if necessary.  
+- Verify any legitimate newsletter by visiting the official site directly (do not use email links).  
+- Enable **Multi-Factor Authentication (MFA)** on affected accounts.  
+- If any link was clicked, run antivirus/antimalware scans and change passwords from a safe device.  
+- Report abuse to the host/provider who handled the message (e.g., provider abuse form for the sending IP) and to the brand being impersonated (e.g., Otto/DoorDash).
+
+---
+
+## Files to include in the repository
+- `README.md` (this file)  
+- `36339167-8284-484f-a0f4-696d059b3b42.jpg` (screenshot)  
+- `findings.txt` (plain text list of the bullets in “Findings” and “Recommendations”)  
+- `email_raw_headers.txt` (copy of full raw headers)  
+- Optional: `email_body.html` (saved HTML of the email)
+
+---
+
+## Suggested repository structure
